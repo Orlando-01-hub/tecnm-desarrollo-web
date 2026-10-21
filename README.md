@@ -79,3 +79,6 @@ Repositorio oficial y entorno de laboratorio interactivo para el curso de **Desa
 ---
 **Docente Titular:** MCC. Iván Márquez Larios (`ijmarquezl`)  
 **Tecnológico Nacional de México — Campus Cancún**
+Alumno: Orlando Tec Cia
+Matricula: 23531101
+Carrera: Ingenieria en sistemas computacionales
