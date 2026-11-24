@@ -73,6 +73,26 @@ async def error_json_invalido(request: Request, exc):
 ```
 
 ---
+## Evidencia Verificada
+
+==============================================================================
+
+VERIFICACIÓN DEL RESULTADO · 4 casos · app.py
+
+==============================================================================
+
+✅ 01. El servidor está vivo y responde JSON
+
+✅ 02. El eco devuelve el mensaje recibido
+
+✅ 03. Un JSON roto no tumba el servidor
+
+✅ 04. El método incorrecto se rechaza con 405
+
+------------------------------------------------------------------------------
+
+RESULTADO: 4/4 casos correctos. ¡Resultado logrado!
+
 
 ## 4. Fase 3: El Auditor (Resultados del Test Harness HTTP)
 *Pruebas ejecutadas:* Pruebas de códigos de estado HTTP 200, 400 y 422
