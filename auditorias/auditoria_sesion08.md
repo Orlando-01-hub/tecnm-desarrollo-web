@@ -142,6 +142,26 @@ async def crear_libro(libro: LibroEntrada):
 
     return nuevo_libro
 ```
+## Evidencia Verificada
+
+==============================================================================
+
+VERIFICACIÓN DEL RESULTADO · 4 casos · app.py
+
+
+==============================================================================
+
+✅ 01. Un libro existente responde 200
+
+✅ 02. Un libro inexistente responde 404 con sobre de error
+
+✅ 03. Los datos inválidos responden 422 con sobre de error
+
+✅ 04. Un libro válido sigue respondiendo 201
+
+------------------------------------------------------------------------------
+
+RESULTADO: 4/4 casos correctos. ¡Resultado logrado!
 
 ---
 
