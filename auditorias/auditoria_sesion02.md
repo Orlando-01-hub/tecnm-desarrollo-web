@@ -28,7 +28,6 @@
 ### 2.2 Prompt Estructurado
 ```text
 [```text
-Actúa como un arquitecto de software senior especializado en APIs RESTful y seguridad web. Utiliza Python 3.10 o superior y FastAPI.
 
 Desarrolla una API REST para administrar productos, aplicando los siguientes requisitos:
 
@@ -144,6 +143,34 @@ def eliminar_producto(producto_id: int):
     del productos[producto_id]
     return Response(status_code=204)
 ```
+## Evidencia Verificada
+
+==============================================================================
+
+VERIFICACIÓN DEL RESULTADO · 8 casos · app.py
+
+==============================================================================
+
+✅ 01. La colección inicia vacía
+
+✅ 02. POST crea el libro con id 1
+
+✅ 03. GET lista el libro creado
+
+✅ 04. GET por id encuentra el libro
+
+✅ 05. PUT reemplaza el libro
+
+✅ 06. DELETE elimina el libro
+
+✅ 07. El libro eliminado ya no existe
+
+✅ 08. PATCH no está implementado: 405, no 404
+
+------------------------------------------------------------------------------
+
+RESULTADO: 8/8 casos correctos. ¡Resultado logrado!
+
 
 **Nota técnica:** El código está diseñado como ejemplo educativo y utiliza almacenamiento temporal en memoria. FastAPI genera automáticamente respuestas `405` para métodos no definidos en una ruta y `422` para errores de validación de solicitudes. El código no sustituye las pruebas reales ni garantiza que no ocurran errores `500`. La implementación requiere Python 3.10 o superior y una versión compatible de FastAPI y Pydantic.
 
