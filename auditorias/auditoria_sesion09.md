@@ -87,13 +87,13 @@ from app import app
 
 cliente = TestClient(app)
 
-# Prueba 1: respuesta normal
+Prueba 1: respuesta normal
 r1 = cliente.get("/api/libros")
 print("PRUEBA 1:", r1.status_code)
 print("Tiempo:", r1.headers.get("x-process-time"))
 print("Request ID:", r1.headers.get("x-request-id"))
 
-# Prueba 2: conservar el ID del cliente
+Prueba 2: conservar el ID del cliente
 r2 = cliente.get(
     "/api/libros",
     headers={"X-Request-ID": "prueba-123"}
@@ -101,11 +101,16 @@ r2 = cliente.get(
 print("\nPRUEBA 2:", r2.status_code)
 print("Request ID:", r2.headers.get("x-request-id"))
 
-# Prueba 3: comprobar respuesta 404
+Prueba 3: comprobar respuesta 404
+
 r3 = cliente.get("/api/no-existe")
+
 print("\nPRUEBA 3:", r3.status_code)
+
 print("Tiempo:", r3.headers.get("x-process-time"))
+
 print("Request ID:", r3.headers.get("x-request-id"))
+
 ---
 ```
 PRUEBA 1: 200
