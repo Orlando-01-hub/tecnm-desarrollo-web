@@ -115,6 +115,27 @@ async def listar_libros():
         "libros": libros
     }
 ```
+## Evidencia Verificada
+
+==============================================================================
+
+VERIFICACIÓN DEL RESULTADO · 5 casos · app.py
+
+==============================================================================
+
+✅ 01. Un libro válido se crea con 201
+
+✅ 02. La cadena numérica se convierte a entero
+
+✅ 03. Un año no numérico produce 422
+
+✅ 04. Un campo extra produce 422
+
+✅ 05. El listado devuelve los libros creados
+
+------------------------------------------------------------------------------
+
+RESULTADO: 5/5 casos correctos. ¡Resultado logrado!
 
 ---
 
