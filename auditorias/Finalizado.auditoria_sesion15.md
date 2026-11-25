@@ -291,7 +291,20 @@ assert respuesta.status_code == 401
 print("\n✅ TODAS LAS PRUEBAS MANUALES FUERON CORRECTAS")
 
 ```
+PRUEBA 1 - GENERAR TOKEN
+HTTP: 200
+Tipo: bearer
+Token generado: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik ...
 
+PRUEBA 2 - PERFIL CON TOKEN VÁLIDO
+HTTP: 200
+{'usuario': 'ana'}
+
+PRUEBA 3 - TOKEN ALTERADO
+HTTP: 401
+
+PRUEBA 4 - SIN TOKEN
+HTTP: 401
 
 ## Evidencia Verificada
 
