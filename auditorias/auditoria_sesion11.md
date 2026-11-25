@@ -61,7 +61,6 @@ y respetando el funcionamiento de la API.]
 ## 3. Código Devuelto por el Model
 ```
 %%writefile app.py
-
 from fastapi import FastAPI
 from router import router
 
