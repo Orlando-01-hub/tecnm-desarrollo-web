@@ -59,6 +59,135 @@ y respetando el funcionamiento de la API.]
 
 ---
 ## 3. Código Devuelto por el Model
+📄 app.py
+Punto de entrada de la aplicación.
+
+
+
+%%writefile app.py
+
+from fastapi import FastAPI
+from router import router
+
+app = FastAPI(title="Biblioteca por capas")
+
+# Incluimos las rutas de libros
+app.include_router(router)
+
+
+     
+Writing app.py
+📄 repositorio.py
+Capa de acceso a datos.
+
+
+%%writefile repositorio.py
+
+
+# Capa de acceso a datos
+# Guarda y recupera libros. No conoce HTTP.
+
+libros = []
+siguiente_id = 1
+
+
+def listar_libros():
+    return libros
+
+
+def guardar_libro(titulo, anio):
+    global siguiente_id
+
+    libro = {
+        "id": siguiente_id,
+        "titulo": titulo,
+        "anio": anio
+    }
+
+    libros.append(libro)
+    siguiente_id += 1
+
+    return libro
+
+
+     
+Writing repositorio.py
+📄 servicio.py
+Capa de lógica de negocio.
+
+
+
+%%writefile servicio.py
+
+# Capa de lógica de negocio
+# Reglas para crear y listar libros.
+
+from repositorio import listar_libros, guardar_libro
+
+
+def obtener_libros():
+    return {
+        "libros": listar_libros()
+    }
+
+
+def crear_libro(titulo, anio):
+    return guardar_libro(titulo, anio)
+
+
+     
+Writing servicio.py
+📄 router.py
+Capa de exposición HTTP.
+
+
+
+%%writefile router.py
+
+from fastapi import APIRouter
+from pydantic import BaseModel, Field
+
+from servicio import obtener_libros, crear_libro
+
+router = APIRouter()
+
+
+# Modelo para recibir los datos del libro
+class LibroEntrada(BaseModel):
+    titulo: str = Field(min_length=1)
+    anio: int = Field(ge=1)
+
+
+# Ruta para listar libros
+@router.get("/api/libros", status_code=200)
+def listar():
+    return obtener_libros()
+
+
+# Ruta para crear libros
+@router.post("/api/libros", status_code=201)
+def crear(datos: LibroEntrada):
+    return crear_libro(datos.titulo, datos.anio)
+
+     
+Writing router.py
+
+
+import os
+
+archivos = [
+    "app.py",
+    "router.py",
+    "servicio.py",
+    "repositorio.py"
+]
+
+for archivo in archivos:
+    if os.path.exists(archivo):
+        print("✅", archivo, "existe")
+    else:
+        print("❌", archivo, "no existe")
+
 
 
 ```
