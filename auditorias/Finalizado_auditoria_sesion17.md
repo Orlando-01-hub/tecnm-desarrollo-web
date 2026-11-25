@@ -123,8 +123,121 @@ def panel_admin(usuario_actual = Depends(obtener_usuario_actual)):
             detail="No tienes permiso para acceder a este recurso"
         )
     return {"panel": "admin"}
+#####################
+%%writefile app.py
+import os
+from datetime import datetime, timedelta, timezone
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from fastapi import Form
+from jose import jwt, JWTError
+
+# Inicializar la aplicación
+app = FastAPI(title="API con Control de Acceso por Roles", version="1.0.0")
+
+# Configuración de seguridad
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("Falta configurar JWT_SECRET_KEY")
+
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+# Base de datos de usuarios de prueba
+USUARIOS = {
+    "admin": {"password": "admin123", "rol": "admin"},
+    "ana": {"password": "secreta", "rol": "user"}
+}
+
+# Herramienta para leer el token
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
+
+# ─── Función para crear el token ───
+def crear_token(usuario: str, rol: str):
+    ahora = datetime.now(timezone.utc)
+    expiracion = ahora + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    datos_token = {
+        "usuario": usuario,
+        "rol": rol,
+        "exp": expiracion
+    }
+    return jwt.encode(datos_token, SECRET_KEY, algorithm=ALGORITHM)
+
+# ─── Dependencia: obtener el usuario actual desde el token ───
+def obtener_usuario_actual(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        usuario = payload.get("usuario")
+        rol = payload.get("rol")
+        if not usuario or not rol:
+            raise HTTPException(
+                status_code=401,
+                detail="Token inválido",
+                headers={"WWW-Authenticate": "Bearer"}
+            )
+        return {"usuario": usuario, "rol": rol}
+    except JWTError:
+        raise HTTPException(
+            status_code=401,
+            detail="Token inválido o expirado",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+
+# ─── Endpoint para obtener token ───
+@app.post("/api/token")
+def login(usuario: str = Form(...), password: str = Form(...)):
+    if usuario not in USUARIOS or USUARIOS[usuario]["password"] != password:
+        raise HTTPException(
+            status_code=401,
+            detail="Credenciales incorrectas",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    rol = USUARIOS[usuario]["rol"]
+    access_token = crear_token(usuario, rol)
+    return {"access_token": access_token, "token_type": "bearer"}
+
+# ─── Ruta del perfil: cualquiera autenticado puede verlo ───
+@app.get("/api/perfil")
+def ver_perfil(usuario_actual = Depends(obtener_usuario_actual)):
+    return {
+        "usuario": usuario_actual["usuario"],
+        "rol": usuario_actual["rol"]
+    }
+
+# ─── Ruta del panel de administración: SOLO para admin ───
+@app.get("/api/admin/panel")
+def panel_admin(usuario_actual = Depends(obtener_usuario_actual)):
+    if usuario_actual["rol"] != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permiso para acceder a este recurso"
+        )
+    return {"panel": "admin"}
 
 ```
+## Evidencia Verificada
+
+==============================================================================
+
+VERIFICACIÓN DEL RESULTADO · 6 casos · app.py
+
+==============================================================================
+
+✅ 01. El administrador obtiene su token
+
+✅ 02. El usuario normal obtiene su token
+
+✅ 03. El admin entra al panel
+
+✅ 04. El usuario normal recibe 403
+
+✅ 05. Sin token recibe 401
+
+✅ 06. El perfil funciona para el usuario normal
+
+------------------------------------------------------------------------------
+
+RESULTADO: 6/6 casos correctos. ¡Resultado logrado!
 
 ---
 
