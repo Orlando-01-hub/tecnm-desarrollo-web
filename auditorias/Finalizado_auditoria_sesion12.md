@@ -46,15 +46,97 @@ respetando los códigos HTTP establecidos en el contrato.]
 ---
 
 ## 3. Código Devuelto por el Modelo
-```python
-# El modelo proporcionó el código de app.py, utilizando FastAPI, Pydantic y Depends.
-Se implementaron:
-La clase RepositorioMemoria.
-Los modelos LibroEntrada y LibroSalida.
-La función get_repositorio().
-El endpoint /api/diagnostico.
-El endpoint POST /api/libros.
-El endpoint GET /api/libros.
+```
+%%writefile app.py
+
+from fastapi import FastAPI, Depends
+from pydantic import BaseModel, Field
+from typing import List
+
+
+app = FastAPI(
+    title="API de Libros con Inyección de Dependencias",
+    version="1.0.0"
+)
+
+
+# 1. Modelo de entrada
+class LibroEntrada(BaseModel):
+    titulo: str = Field(min_length=1)
+    anio: int
+
+
+# 2. Modelo de salida
+class LibroSalida(BaseModel):
+    id: int
+    titulo: str
+    anio: int
+
+
+# 3. Repositorio en memoria
+class RepositorioMemoria:
+
+    def __init__(self):
+        self.libros = []
+        self.siguiente_id = 1
+
+    def crear(self, libro: LibroEntrada):
+        nuevo_libro = LibroSalida(
+            id=self.siguiente_id,
+            titulo=libro.titulo,
+            anio=libro.anio
+        )
+
+        self.libros.append(nuevo_libro)
+        self.siguiente_id += 1
+
+        return nuevo_libro
+
+    def obtener_todos(self):
+        return self.libros
+
+
+# 4. Instancia compartida del repositorio
+repositorio_memoria = RepositorioMemoria()
+
+
+# 5. Función de inyección de dependencias
+def get_repositorio() -> RepositorioMemoria:
+    return repositorio_memoria
+
+
+# 6. Diagnóstico
+@app.get("/api/diagnostico")
+def diagnostico(
+    repositorio: RepositorioMemoria = Depends(get_repositorio)
+):
+    return {
+        "repositorio": type(repositorio).__name__
+    }
+
+
+# 7. Crear un libro
+@app.post(
+    "/api/libros",
+    response_model=LibroSalida,
+    status_code=201
+)
+def crear_libro(
+    libro: LibroEntrada,
+    repositorio: RepositorioMemoria = Depends(get_repositorio)
+):
+    return repositorio.crear(libro)
+
+
+# 8. Consultar todos los libros
+@app.get("/api/libros")
+def listar_libros(
+    repositorio: RepositorioMemoria = Depends(get_repositorio)
+):
+    return {
+        "libros": repositorio.obtener_todos()
+    }
+
 ```
 ## Evidencia Verificada
 
