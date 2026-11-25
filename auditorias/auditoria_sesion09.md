@@ -82,6 +82,61 @@ async def listar_libros():
     return {"libros": []}
 
 ```
+from fastapi.testclient import TestClient
+from app import app
+
+cliente = TestClient(app)
+
+# Prueba 1: respuesta normal
+r1 = cliente.get("/api/libros")
+print("PRUEBA 1:", r1.status_code)
+print("Tiempo:", r1.headers.get("x-process-time"))
+print("Request ID:", r1.headers.get("x-request-id"))
+
+# Prueba 2: conservar el ID del cliente
+r2 = cliente.get(
+    "/api/libros",
+    headers={"X-Request-ID": "prueba-123"}
+)
+print("\nPRUEBA 2:", r2.status_code)
+print("Request ID:", r2.headers.get("x-request-id"))
+
+# Prueba 3: comprobar respuesta 404
+r3 = cliente.get("/api/no-existe")
+print("\nPRUEBA 3:", r3.status_code)
+print("Tiempo:", r3.headers.get("x-process-time"))
+print("Request ID:", r3.headers.get("x-request-id"))
+---
+```
+PRUEBA 1: 200
+Tiempo: 0.0010
+Request ID: 071fb0e2-7c89-4338-87e7-68ee54178a86
+
+PRUEBA 2: 200
+Request ID: prueba-123
+
+PRUEBA 3: 404
+Tiempo: 0.0004
+Request ID: 7c3e60b7-53bf-47c7-9bf4-6643b897cf79
+---
+```
+## Evidencia Verificada
+
+==============================================================================
+
+VERIFICACIÓN DEL RESULTADO · 3 casos · app.py
+
+==============================================================================
+
+✅ 01. Una respuesta correcta trae tiempo y traza
+
+✅ 02. El X-Request-ID del cliente se conserva
+
+✅ 03. El middleware también cubre los 404
+
+------------------------------------------------------------------------------
+
+RESULTADO: 3/3 casos correctos. ¡Resultado logrado!
 
 ---
 
