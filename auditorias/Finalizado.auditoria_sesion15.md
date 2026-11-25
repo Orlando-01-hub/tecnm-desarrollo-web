@@ -208,9 +208,123 @@ def obtener_perfil(
     return {
         "usuario": usuario
     }
+
 ```
+---
+from fastapi.testclient import TestClient
+from app import app
+
+cliente = TestClient(app)
+
+
+# PRUEBA 1: Obtener token
+respuesta = cliente.post(
+    "/api/token",
+    json={
+        "usuario": "ana",
+        "password": "secreta"
+    }
+)
+
+print("PRUEBA 1 - GENERAR TOKEN")
+print("HTTP:", respuesta.status_code)
+
+assert respuesta.status_code == 200
+
+token = respuesta.json()["access_token"]
+
+print("Tipo:", respuesta.json()["token_type"])
+print("Token generado:", token[:30], "...")
+
+
+# PRUEBA 2: Acceder al perfil con token válido
+respuesta = cliente.get(
+    "/api/perfil",
+    headers={
+        "Authorization": f"Bearer {token}"
+    }
+)
+
+print("\nPRUEBA 2 - PERFIL CON TOKEN VÁLIDO")
+print("HTTP:", respuesta.status_code)
+print(respuesta.json())
+
+assert respuesta.status_code == 200
+assert respuesta.json() == {"usuario": "ana"}
+
+
+# PRUEBA 3: Token alterado
+partes_token = token.split(".")
+firma = partes_token[2]
+
+firma_alterada = (
+    "A" if firma[0] != "A" else "B"
+) + firma[1:]
+
+token_alterado = (
+    partes_token[0] + "."
+    + partes_token[1] + "."
+    + firma_alterada
+)
+
+respuesta = cliente.get(
+    "/api/perfil",
+    headers={
+        "Authorization": f"Bearer {token_alterado}"
+    }
+)
+
+print("\nPRUEBA 3 - TOKEN ALTERADO")
+print("HTTP:", respuesta.status_code)
+
+assert respuesta.status_code == 401
+
+
+# PRUEBA 4: Acceder sin token
+respuesta = cliente.get("/api/perfil")
+
+print("\nPRUEBA 4 - SIN TOKEN")
+print("HTTP:", respuesta.status_code)
+
+assert respuesta.status_code == 401
+
+
+print("\n✅ TODAS LAS PRUEBAS MANUALES FUERON CORRECTAS")
 
 ---
+
+## Evidencia Verificada
+
+==============================================================================
+
+VERIFICACIÓN DEL RESULTADO · 4 casos · app.py
+
+==============================================================================
+
+✅ 01. El login emite un token
+
+✅ 02. El token válido abre el perfil
+
+✅ 03. Un token alterado es rechazado
+
+✅ 04. Sin token no hay acceso
+
+------------------------------------------------------------------------------
+
+RESULTADO: 4/4 casos correctos. ¡Resultado logrado!
+
+from verificar import revisar_archivo, resumen
+
+resultados = []
+resultados.append(revisar_archivo("app.py", regex=["jwt|jose"], descripcion="Se usa una librería JWT"))
+resumen(resultados)
+
+     
+✅ Se usa una librería JWT
+
+------------------------------------------------------------------------------
+
+RESULTADO: 1/1 comprobaciones correctas. ¡Resultado logrado!
 
 ## 4. Fase 3: El Auditor (Resultados del Test Harness HTTP)
 *Pruebas ejecutadas:* Pruebas con tokens alterados o firma inválida
