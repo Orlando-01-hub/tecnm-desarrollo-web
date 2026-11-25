@@ -209,8 +209,7 @@ def obtener_perfil(
         "usuario": usuario
     }
 
-```
----
+
 from fastapi.testclient import TestClient
 from app import app
 
@@ -291,7 +290,8 @@ assert respuesta.status_code == 401
 
 print("\n✅ TODAS LAS PRUEBAS MANUALES FUERON CORRECTAS")
 
----
+```
+
 
 ## Evidencia Verificada
 
