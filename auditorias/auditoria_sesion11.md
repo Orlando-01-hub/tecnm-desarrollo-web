@@ -61,6 +61,8 @@ y respetando el funcionamiento de la API.]
 
 ## 3. Código Devuelto por el Modelo
 ```
+# app.py
+
 %%writefile app.py
 
 from fastapi import FastAPI
@@ -70,13 +72,17 @@ app = FastAPI(title="Biblioteca por capas")
 
 # Incluimos las rutas de libros
 app.include_router(router)
+---
 
 ## repositorio.py
-%%writefile repositorio.py
 
+```
+
+%%writefile repositorio.p
 
 # Capa de acceso a datos
 # Guarda y recupera libros. No conoce HTTP.
+
 
 libros = []
 siguiente_id = 1
@@ -99,7 +105,13 @@ def guardar_libro(titulo, anio):
     siguiente_id += 1
 
     return libro
+    
+---
+
 ## servicio.py
+
+```
+
 %%writefile servicio.py
 
 # Capa de lógica de negocio
@@ -117,6 +129,9 @@ def obtener_libros():
 def crear_libro(titulo, anio):
     return guardar_libro(titulo, anio)
 
+---
+
+---
 ## router.py
 %%writefile router.py
 
