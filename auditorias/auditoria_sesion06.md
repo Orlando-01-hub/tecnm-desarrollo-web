@@ -92,6 +92,28 @@ def listar_libros(
         "limite": limite
     }
 ```
+## Evidencia Verificada
+==============================================================================
+
+VERIFICACIÓN DEL RESULTADO · 6 casos · app.py
+
+==============================================================================
+
+✅ 01. Un libro dentro de los límites se crea
+
+✅ 02. Un título demasiado corto produce 422
+
+✅ 03. Un año fuera de rango produce 422
+
+✅ 04. Un precio no positivo produce 422
+
+✅ 05. El límite de paginación debe ser al menos 1
+
+✅ 06. Un límite válido responde 200
+
+------------------------------------------------------------------------------
+
+RESULTADO: 6/6 casos correctos. ¡Resultado logrado!
 
 ---
 
