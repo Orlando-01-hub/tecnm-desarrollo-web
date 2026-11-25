@@ -27,7 +27,7 @@
 
 ### 2.2 Prompt Estructurado
 ```text 
-[Desarrolla una API RESTful utilizando Python y FastAPI para administrar consultas de autores y libros. Utiliza rutas con nombres de recursos, permite filtrar los libros por género y limitar los resultados. Si el autor no existe, devuelve un error HTTP 404 con el mensaje correspondiente. Las respuestas deben estar en formato JSON y cumplir con los criterios de verificación de la actividad.]
+Desarrolla una API RESTful utilizando Python y FastAPI para administrar consultas de autores y libros. Utiliza rutas con nombres de recursos, permite filtrar los libros por género y limitar los resultados. Si el autor no existe, devuelve un error HTTP 404 con el mensaje correspondiente. Las respuestas deben estar en formato JSON y cumplir con los criterios de verificación de la actividad.
 ```
 
 ---
@@ -144,6 +144,25 @@ def obtener_libros_autor(
         "libros": resultado
     }
 ```
+## Evidencia Verificada
+
+==============================================================================
+
+VERIFICACIÓN DEL RESULTADO · 4 casos · app.py
+
+==============================================================================
+
+✅ 01. Libros del autor 1
+
+✅ 02. Filtro por género y límite
+
+✅ 03. Un autor inexistente produce 404
+
+✅ 04. La colección completa de libros
+
+------------------------------------------------------------------------------
+
+RESULTADO: 4/4 casos correctos. ¡Resultado logrado!
 
 ---
 
