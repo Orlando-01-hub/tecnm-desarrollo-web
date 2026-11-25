@@ -141,6 +141,25 @@ async def listar_libros(request: Request):
         media_type="application/json"
     )
 ```
+## Evidencia Verificada
+
+==============================================================================
+
+VERIFICACIÓN DEL RESULTADO · 4 casos · app.py
+
+==============================================================================
+
+✅ 01. POST válido en JSON
+
+✅ 02. POST en texto plano se rechaza con 415
+
+✅ 03. GET que pide XML se rechaza con 406
+
+✅ 04. GET que acepta JSON responde 200
+
+------------------------------------------------------------------------------
+
+RESULTADO: 4/4 casos correctos. ¡Resultado logrado!
 
 ---
 
