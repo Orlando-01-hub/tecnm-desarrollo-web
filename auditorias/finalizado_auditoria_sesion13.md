@@ -43,20 +43,111 @@ Archivo app.py funcional con modelos Pydantic, manejo de cookies y respuestas HT
 ---
 
 ## 3. Código Devuelto por el Modelo
-```python
-#
-El modelo proporcionó el código de app.py utilizando FastAPI y Pydantic.
-Se implementaron los siguientes elementos:
-Diccionario sesiones para guardar las sesiones activas.
-Modelo LoginEntrada para validar usuario y contraseña.
-Endpoint POST /api/login para iniciar sesión.
-Generación de identificadores aleatorios con secrets.token_urlsafe(32).
-Cookie session_id con protección HttpOnly.
-Endpoint GET /api/perfil para consultar los datos del usuario.
-Endpoint POST /api/logout para cerrar y eliminar la sesión.
 ```
+%%writefile app.py
+
+from fastapi import FastAPI, HTTPException, Response, Cookie
+from pydantic import BaseModel
+import secrets
+
+app = FastAPI(
+    title="API de Sesiones Stateful",
+    version="1.0.0"
+)
+
+# 1. Usuario de prueba
+USUARIO = "ana"
+PASSWORD = "secreta"
+
+# 2. Almacenamiento de sesiones en memoria
+sesiones = {}
+
+
+# 3. Modelo de entrada para el login
+class LoginEntrada(BaseModel):
+    usuario: str
+    password: str
+
+
+# 4. Endpoint para iniciar sesión
+@app.post("/api/login")
+def login(datos: LoginEntrada, response: Response):
+
+    if datos.usuario != USUARIO or datos.password != PASSWORD:
+        raise HTTPException(
+            status_code=401,
+            detail="Usuario o contraseña incorrectos"
+        )
+
+    # Generar un identificador aleatorio
+    session_id = secrets.token_urlsafe(32)
+
+    # Guardar la sesión en el servidor
+    sesiones[session_id] = datos.usuario
+
+    # Enviar cookie al cliente
+    response.set_cookie(
+        key="session_id",
+        value=session_id,
+        httponly=True,
+        path="/",
+        samesite="lax"
+    )
+
+    return {"mensaje": "sesión iniciada"}
+
+
+# 5. Endpoint para consultar el perfil
+@app.get("/api/perfil")
+def perfil(session_id: str | None = Cookie(default=None)):
+
+    if not session_id or session_id not in sesiones:
+        raise HTTPException(
+            status_code=401,
+            detail="Sesión no válida"
+        )
+
+    return {"usuario": sesiones[session_id]}
+
+
+# 6. Endpoint para cerrar sesión
+@app.post("/api/logout")
+def logout(
+    response: Response,
+    session_id: str | None = Cookie(default=None)
+):
+
+    if not session_id or session_id not in sesiones:
+        raise HTTPException(
+            status_code=401,
+            detail="Sesión no válida"
+        )
+
+    # Eliminar la sesión del servidor
+    del sesiones[session_id]
+
+    # Eliminar la cookie del cliente
+    response.delete_cookie(
+        key="session_id",
+        path="/",
+        httponly=True,
+        samesite="lax"
+    )
+
+    return Response(status_code=204)
 
 ---
+## Evidencia Verificada
+==============================================================================
+VERIFICACIÓN DEL RESULTADO · 4 casos · app.py
+==============================================================================
+✅ 01. Login correcto y cookie HttpOnly
+✅ 02. El perfil se obtiene con la cookie
+✅ 03. El logout cierra la sesión
+✅ 04. Después del logout el perfil es 401
+------------------------------------------------------------------------------
+RESULTADO: 4/4 casos correctos. ¡Resultado logrado!
+
 
 ## 4. Fase 3: El Auditor (Resultados del Test Harness HTTP)
 *Pruebas ejecutadas:* Pruebas de expiración y revocación de sesión
