@@ -56,6 +56,41 @@ El endpoint /api/diagnostico.
 El endpoint POST /api/libros.
 El endpoint GET /api/libros.
 ```
+## Evidencia Verificada
+
+==============================================================================
+
+VERIFICACIÓN DEL RESULTADO · 4 casos · app.py
+
+==============================================================================
+
+✅ 01. El diagnóstico revela el repositorio inyectado
+
+✅ 02. El endpoint inyectado crea un libro
+
+✅ 03. El repositorio conserva el estado
+
+✅ 04. La validación sigue en el borde
+
+------------------------------------------------------------------------------
+
+RESULTADO: 4/4 casos correctos. ¡Resultado logrado!
+
+from verificar import revisar_archivo, resumen
+
+resultados = []
+resultados.append(revisar_archivo("app.py", exigir=["Depends"], descripcion="El endpoint usa Depends"))
+resultados.append(revisar_archivo("app.py", exigir=["get_repositorio"], descripcion="Existe la función de inyección"))
+resumen(resultados)
+
+     
+✅ El endpoint usa Depends
+
+✅ Existe la función de inyección
+
+------------------------------------------------------------------------------
+
+RESULTADO: 2/2 comprobaciones correctas. ¡Resultado logrado!
 
 ---
 
