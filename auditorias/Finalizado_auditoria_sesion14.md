@@ -150,6 +150,36 @@ def iniciar_sesion(datos: UsuarioEntrada):
     }
 
 ```
+## Evidencia Verificada
+
+==============================================================================
+
+VERIFICACIÓN DEL RESULTADO · 3 casos · app.py
+
+==============================================================================
+
+✅ 01. El registro responde sin filtrar la contraseña
+
+✅ 02. El login correcto autentica
+
+✅ 03. La contraseña incorrecta se rechaza
+
+------------------------------------------------------------------------------
+
+RESULTADO: 3/3 casos correctos. ¡Resultado logrado!
+
+from verificar import revisar_archivo, resumen
+
+resultados = []
+resultados.append(revisar_archivo("app.py", regex=["bcrypt|passlib"], descripcion="Se usa un algoritmo de hashing para contraseñas"))
+resumen(resultados)
+
+     
+✅ Se usa un algoritmo de hashing para contraseñas
+
+------------------------------------------------------------------------------
+
+RESULTADO: 1/1 comprobaciones correctas. ¡Resultado logrado!
 
 ---
 
