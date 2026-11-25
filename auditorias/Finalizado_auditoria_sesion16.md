@@ -102,6 +102,25 @@ def obtener_perfil(token: str = Depends(oauth2_scheme)):
     return {"usuario": usuario}
 
 ```
+==============================================================================
+
+VERIFICACIÓN DEL RESULTADO · 4 casos · app.py
+
+==============================================================================
+
+✅ 01. El formulario de login emite token
+
+✅ 02. El token Bearer abre el perfil
+
+✅ 03. Sin token se responde 401 con WWW-Authenticate
+
+✅ 04. Un esquema distinto se rechaza
+
+------------------------------------------------------------------------------
+
+RESULTADO: 4/4 casos correctos. ¡Resultado logrado!
+
+------------------------------------------------------------------------------
 
 ---
 
