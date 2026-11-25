@@ -91,8 +91,11 @@ PRUEBA 2: 200
 Request ID: prueba-123
 
 PRUEBA 3: 404
+
 Tiempo: 0.0004
+
 Request ID: 7c3e60b7-53bf-47c7-9bf4-6643b897cf79
+
 ---
 ```
 ## Evidencia Verificada
