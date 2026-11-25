@@ -60,6 +60,7 @@ y respetando el funcionamiento de la API.]
 ---
 ## 3. Código Devuelto por el Model
 ```
+app.py
 %%writefile app.py
 from fastapi import FastAPI
 from router import router
@@ -68,6 +69,7 @@ app = FastAPI(title="Biblioteca por capas")
 
 # Incluimos las rutas de libros
 app.include_router(router)
+
 
 # repositorio.py
 
@@ -96,6 +98,82 @@ def guardar_libro(titulo, anio):
     siguiente_id += 1
 
     return libro
+
+
+# repositorio.py
+%%writefile repositorio.py
+# Capa de acceso a datos
+# Guarda y recupera libros. No conoce HTTP.
+
+libros = []
+siguiente_id = 1
+
+
+def listar_libros():
+    return libros
+
+
+def guardar_libro(titulo, anio):
+    global siguiente_id
+
+    libro = {
+        "id": siguiente_id,
+        "titulo": titulo,
+        "anio": anio
+    }
+
+    libros.append(libro)
+    siguiente_id += 1
+
+    return libro
+
+
+# servicio.py
+
+%%writefile servicio.py
+# Capa de lógica de negocio
+# Reglas para crear y listar libros.
+
+from repositorio import listar_libros, guardar_libro
+
+
+def obtener_libros():
+    return {
+        "libros": listar_libros()
+    }
+
+
+def crear_libro(titulo, anio):
+    return guardar_libro(titulo, anio)
+
+
+# router.py
+
+%%writefile router.py
+from fastapi import APIRouter
+from pydantic import BaseModel, Field
+
+from servicio import obtener_libros, crear_libro
+
+router = APIRouter()
+
+
+# Modelo para recibir los datos del libro
+class LibroEntrada(BaseModel):
+    titulo: str = Field(min_length=1)
+    anio: int = Field(ge=1)
+
+
+# Ruta para listar libros
+@router.get("/api/libros", status_code=200)
+def listar():
+    return obtener_libros()
+
+
+# Ruta para crear libros
+@router.post("/api/libros", status_code=201)
+def crear(datos: LibroEntrada):
+    return crear_libro(datos.titulo, datos.anio)
 
 
 ```
