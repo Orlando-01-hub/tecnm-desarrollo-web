@@ -69,6 +69,34 @@ app = FastAPI(title="Biblioteca por capas")
 # Incluimos las rutas de libros
 app.include_router(router)
 
+# repositorio.py
+
+%%writefile repositorio.py
+# Capa de acceso a datos
+# Guarda y recupera libros. No conoce HTTP.
+
+libros = []
+siguiente_id = 1
+
+
+def listar_libros():
+    return libros
+
+
+def guardar_libro(titulo, anio):
+    global siguiente_id
+
+    libro = {
+        "id": siguiente_id,
+        "titulo": titulo,
+        "anio": anio
+    }
+
+    libros.append(libro)
+    siguiente_id += 1
+
+    return libro
+
 
 ```
 
