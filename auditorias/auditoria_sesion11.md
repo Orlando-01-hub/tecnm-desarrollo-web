@@ -60,6 +60,7 @@ y respetando el funcionamiento de la API.]
 ---
 
 ## 3. Código Devuelto por el Modelo
+
 ```
 # app.py
 
@@ -72,10 +73,9 @@ app = FastAPI(title="Biblioteca por capas")
 
 # Incluimos las rutas de libros
 app.include_router(router)
+
 ---
-
 ## repositorio.py
-
 ```
 
 %%writefile repositorio.p
