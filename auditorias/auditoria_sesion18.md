@@ -35,9 +35,106 @@
 ---
 
 ## 3. Código Devuelto por el Modelo
-```python
-# Se utilizó Python con FastAPI para implementar el control de peticiones mediante un contador independiente por dirección IP. Se agregó una ventana de 60 segundos, control de concurrencia y una respuesta HTTP 429 con el encabezado Retry-After cuando se supera el límite.
 ```
+%%writefile app.py
+
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+import time
+import math
+import threading
+
+app = FastAPI(
+    title="API con Rate Limiting",
+    version="1.0.0"
+)
+
+# Configuración del límite
+LIMITE_PETICIONES = 3
+VENTANA_SEGUNDOS = 60
+
+# Almacena el contador de cada cliente
+contadores = {}
+
+# Protege el acceso al contador
+bloqueo = threading.Lock()
+
+
+@app.get("/api/recurso")
+def obtener_recurso(request: Request):
+
+    # Identificar al cliente mediante su IP
+    cliente = request.client.host if request.client else "desconocido"
+
+    # Obtener el tiempo actual
+    ahora = time.monotonic()
+
+    with bloqueo:
+
+        # Consultar si el cliente ya tiene un contador
+        if cliente not in contadores:
+            contadores[cliente] = {
+                "inicio": ahora,
+                "peticiones": 0
+            }
+
+        registro = contadores[cliente]
+
+        # Calcular cuánto tiempo ha pasado
+        tiempo_transcurrido = ahora - registro["inicio"]
+
+        # Reiniciar el contador si terminó la ventana
+        if tiempo_transcurrido >= VENTANA_SEGUNDOS:
+            registro["inicio"] = ahora
+            registro["peticiones"] = 0
+
+        # Comprobar si alcanzó el límite
+        if registro["peticiones"] >= LIMITE_PETICIONES:
+
+            tiempo_restante = (
+                VENTANA_SEGUNDOS -
+                (ahora - registro["inicio"])
+            )
+
+            retry_after = max(1, math.ceil(tiempo_restante))
+
+            return JSONResponse(
+                status_code=429,
+                content={
+                    "error": "límite de peticiones alcanzado"
+                },
+                headers={
+                    "Retry-After": str(retry_after)
+                }
+            )
+
+        # Registrar la petición permitida
+        registro["peticiones"] += 1
+
+    # Respuesta normal
+    return {
+        "mensaje": "Petición permitida",
+        "estado": "correcto"
+    }
+
+```
+==============================================================================
+
+VERIFICACIÓN DEL RESULTADO · 4 casos · app.py
+
+==============================================================================
+
+✅ 01. Primera petición permitida
+
+✅ 02. Segunda petición permitida
+
+✅ 03. Tercera petición permitida
+
+✅ 04. La cuarta petición se limita
+
+------------------------------------------------------------------------------
+
+RESULTADO: 4/4 casos correctos. ¡Resultado logrado!
 
 ---
 
