@@ -60,16 +60,137 @@ y respetando el funcionamiento de la API.]
 ---
 
 ## 3. Código Devuelto por el Modelo
-```python
-# La IA propuso separar el proyecto en cuatro archivos:
- app.py: crea la aplicación FastAPI e incorpora el router.
-
-router.py: define las rutas GET y POST y valida los datos recibidos mediante Pydantic.
-
-servicio.py: contiene las funciones para crear y consultar libros.
-
-repositorio.py: guarda los libros en una lista en memoria y asigna un ID automáticamente.
 ```
+%%writefile app.py
+
+from fastapi import FastAPI
+from router import router
+
+app = FastAPI(title="Biblioteca por capas")
+
+# Incluimos las rutas de libros
+app.include_router(router)
+
+## repositorio.py
+%%writefile repositorio.py
+
+
+# Capa de acceso a datos
+# Guarda y recupera libros. No conoce HTTP.
+
+libros = []
+siguiente_id = 1
+
+
+def listar_libros():
+    return libros
+
+
+def guardar_libro(titulo, anio):
+    global siguiente_id
+
+    libro = {
+        "id": siguiente_id,
+        "titulo": titulo,
+        "anio": anio
+    }
+
+    libros.append(libro)
+    siguiente_id += 1
+
+    return libro
+## servicio.py
+%%writefile servicio.py
+
+# Capa de lógica de negocio
+# Reglas para crear y listar libros.
+
+from repositorio import listar_libros, guardar_libro
+
+
+def obtener_libros():
+    return {
+        "libros": listar_libros()
+    }
+
+
+def crear_libro(titulo, anio):
+    return guardar_libro(titulo, anio)
+
+## router.py
+%%writefile router.py
+
+from fastapi import APIRouter
+from pydantic import BaseModel, Field
+
+from servicio import obtener_libros, crear_libro
+
+router = APIRouter()
+
+
+# Modelo para recibir los datos del libro
+class LibroEntrada(BaseModel):
+    titulo: str = Field(min_length=1)
+    anio: int = Field(ge=1)
+
+
+# Ruta para listar libros
+@router.get("/api/libros", status_code=200)
+def listar():
+    return obtener_libros()
+
+
+# Ruta para crear libros
+@router.post("/api/libros", status_code=201)
+def crear(datos: LibroEntrada):
+    return crear_libro(datos.titulo, datos.anio)
+
+## verificacion
+
+import os
+
+archivos = [
+    "app.py",
+    "router.py",
+    "servicio.py",
+    "repositorio.py"
+]
+
+for archivo in archivos:
+    if os.path.exists(archivo):
+        print("✅", archivo, "existe")
+    else:
+        print("❌", archivo, "no existe")
+
+✅ app.py existe
+
+✅ router.py existe
+
+✅ servicio.py existe
+
+✅ repositorio.py existe
+
+
+```
+## Evidencia Verificada 
+
+==============================================================================
+
+VERIFICACIÓN DEL RESULTADO · 4 casos · app.py
+
+==============================================================================
+
+✅ 01. El listado inicia vacío
+
+✅ 02. El servicio crea un libro
+
+✅ 03. El listado conserva el contrato
+
+✅ 04. La validación del router sigue funcionando
+
+------------------------------------------------------------------------------
+
+RESULTADO: 4/4 casos correctos. ¡Resultado logrado!
 
 ---
 
